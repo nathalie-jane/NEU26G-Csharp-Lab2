@@ -11,11 +11,11 @@ namespace DungeonCrawler.Entities.Enemies
     {
         public string Species { get; }
         public int HealthPoints { get; protected set; }
-        public Dice Attack { get; }
-        public Dice Defense { get; }
+        public DiceConfiguration Attack { get; }
+        public DiceConfiguration Defense { get; }
 
         // Initialise properties shared by enemies
-        protected Enemy(Position position, char entity, ConsoleColor entityColor, string species, int healthPoints, Dice attack, Dice defense) : base(position, entity, entityColor)
+        protected Enemy(Position position, char entity, ConsoleColor entityColor, string species, int healthPoints, DiceConfiguration attack, DiceConfiguration defense) : base(position, entity, entityColor)
         {
             Species = species;
             HealthPoints = healthPoints;
