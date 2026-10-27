@@ -20,8 +20,8 @@ namespace DungeonCrawler.Entities
             EntityColor = entityColor;
         }
 
-        // Display game elements on the console
-        public void Draw()
+        // Render game elements on the console
+        public void Render()
         {
             Console.SetCursorPosition(Position.XPosition, Position.YPosition); // Set game element position on the console
 
