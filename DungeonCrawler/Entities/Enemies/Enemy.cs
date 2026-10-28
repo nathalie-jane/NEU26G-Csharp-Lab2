@@ -10,7 +10,7 @@ namespace DungeonCrawler.Entities.Enemies
     internal abstract class Enemy : LevelElement
     {
         public string Species { get; }
-        public int HealthPoints { get; protected set; }
+        public int HealthPoints { get; protected set; } // Allow health points to be modified only within Enemy class and its subclasses
         public DiceConfiguration Attack { get; }
         public DiceConfiguration Defense { get; }
 

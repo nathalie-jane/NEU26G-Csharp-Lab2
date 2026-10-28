@@ -7,6 +7,7 @@ namespace DungeonCrawler.Systems.Combat
     // Dice configuration for combat mechanics
     internal class DiceConfiguration
     {
+        // Read-only to prevent changes to dice configuration after initialisation
         public int Quantity { get; }
         public int Sides { get; }
         public int Modifier { get; }

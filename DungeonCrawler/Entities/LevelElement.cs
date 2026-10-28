@@ -8,7 +8,8 @@ namespace DungeonCrawler.Entities
     // Shared properties and behavior for all game elements
     internal abstract class LevelElement
     {
-        public Position Position { get; protected set; }
+        
+        public Position Position { get; protected set; } // Allow position to be modified only within LevelElement class and its subclasses
         public char Entity { get; }
         public ConsoleColor EntityColor { get; }
 
@@ -23,7 +24,7 @@ namespace DungeonCrawler.Entities
         // Render game elements on the console
         public void Render()
         {
-            Console.SetCursorPosition(Position.XPosition, Position.YPosition); // Set game element position on the console
+            Console.SetCursorPosition(Position.XPosition, Position.YPosition); // Set position for game elements on the console
 
             Console.ForegroundColor = EntityColor;
             Console.Write(Entity);

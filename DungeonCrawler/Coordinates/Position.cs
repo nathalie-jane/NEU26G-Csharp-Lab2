@@ -7,6 +7,7 @@ namespace DungeonCrawler.Coordinates
     // X and Y coordinates for game elements
     internal readonly record struct Position
     {
+        // Read-only to prevent changes to coordinates after initialisation
         public int XPosition { get; }
         public int YPosition { get; }
 
