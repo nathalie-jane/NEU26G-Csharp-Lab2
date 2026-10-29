@@ -1,5 +1,6 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Entities;
+using DungeonCrawler.Entities.Enemies;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,9 +9,9 @@ namespace DungeonCrawler.Levels
 {
     internal class LevelData
     {
-        private List<LevelElement> elements = new();
+        private List<LevelEntity> entities = new();
 
-        public IReadOnlyList<LevelElement> Elements => elements;
+        public IReadOnlyList<LevelEntity> Entities => entities;
 
         public void LoadLevel(string filename)
         {

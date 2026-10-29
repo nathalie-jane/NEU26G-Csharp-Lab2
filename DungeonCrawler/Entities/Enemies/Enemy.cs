@@ -7,7 +7,7 @@ using System.Text;
 namespace DungeonCrawler.Entities.Enemies
 {
     // Shared properties and behavior for all enemies
-    internal abstract class Enemy : LevelElement
+    internal abstract class Enemy : LevelEntity
     {
         public string Species { get; }
         public int HealthPoints { get; protected set; } // Allow health points to be modified only within Enemy class and its subclasses
