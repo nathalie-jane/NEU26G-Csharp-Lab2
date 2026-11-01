@@ -5,10 +5,11 @@ using System.Text;
 
 namespace DungeonCrawler.Entities
 {
-    // Wall element that inherits properties and behavior from LevelElement
+    // Extend LevelEntity with predefined values for walls
     internal class Wall : LevelEntity
     {
-        // Initialise wall element with X and Y coordinates, fixed character and color
-        public Wall(Position position) : base(position, '#', ConsoleColor.Gray) { }
+        // Initialise properties shared by walls
+        public Wall(Position position) 
+            : base(position, '#', ConsoleColor.Gray) { }
     }
 }

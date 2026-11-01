@@ -7,14 +7,14 @@ using System.Text;
 
 namespace DungeonCrawler.Levels
 {
-    // Store and manage game entities from level file
+    // Read and process data from level file to create game entities and starting position for player
     internal class LevelData
     {
-        private readonly List<LevelEntity> entities = new(); // Store references to all game entities created from level file
+        private readonly List<LevelEntity> entities = new(); // Store references to all game entities
         public IReadOnlyList<LevelEntity> Entities => entities; // Make entities list read-only to prevent external modification
-        public Position? PlayerStartPosition { get; private set; } // Store starting position when the correct symbol is found in the level file
+        public Position? PlayerStartPosition { get; private set; } // Store starting position when the correct symbol is found
 
-        // Load game entities and starting position for player from level file
+        // Read and process data from level file
         public void LoadLevel(string filename)
         {
             using (StreamReader reader = new(filename))
@@ -23,10 +23,10 @@ namespace DungeonCrawler.Levels
 
                 string? currentRow = reader.ReadLine();
 
-                // Read and process each row from level file
+                // Process each row
                 while (currentRow is not null)
                 {
-                    // Read and process each column to identify map symbols and create corresponding game entities
+                    // Process each column to identify map symbols and create corresponding game entities
                     for (int mapColumnIndex = 0; mapColumnIndex < currentRow.Length; mapColumnIndex++)
                     {
                         char displaySymbol = currentRow[mapColumnIndex];
@@ -42,7 +42,7 @@ namespace DungeonCrawler.Levels
                                 break;
 
                             case '@':
-                                PlayerStartPosition = position; // Set starting position for player based on level file
+                                PlayerStartPosition = position; // Set starting position for player
 
                                 break;
 

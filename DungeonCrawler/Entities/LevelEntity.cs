@@ -5,7 +5,7 @@ using System.Text;
 
 namespace DungeonCrawler.Entities
 {
-    // Shared properties and behavior for all game entities
+    // Base class for all game entities
     internal abstract class LevelEntity
     {
         public Position Position { get; protected set; } // Allow position to be modified only within LevelEntity class and its subclasses

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DungeonCrawler.Entities.Characters
 {
-    // Shared properties and behavior for all game characters
+    // Base class for all game characters
     internal abstract class Character : LevelEntity
     {
         public int HealthPoints { get; protected set; } // Allow health points to be modified only within Character class and its subclasses
@@ -14,7 +14,8 @@ namespace DungeonCrawler.Entities.Characters
         public DiceConfiguration Defense { get; }
 
         // Initialise properties shared by game characters
-        protected Character(Position position, char displaySymbol, ConsoleColor displayColor, int healthPoints, DiceConfiguration attack, DiceConfiguration defense) : base(position, displaySymbol, displayColor)
+        protected Character(Position position, char displaySymbol, ConsoleColor displayColor, int healthPoints, DiceConfiguration attack, DiceConfiguration defense) 
+            : base(position, displaySymbol, displayColor)
         {
             HealthPoints = healthPoints;
             Attack = attack;
