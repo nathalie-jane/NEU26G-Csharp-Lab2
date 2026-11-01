@@ -8,7 +8,6 @@ namespace DungeonCrawler.Entities
     // Shared properties and behavior for all game entities
     internal abstract class LevelEntity
     {
-        
         public Position Position { get; protected set; } // Allow position to be modified only within LevelEntity class and its subclasses
         public char DisplaySymbol { get; }
         public ConsoleColor DisplayColor { get; }

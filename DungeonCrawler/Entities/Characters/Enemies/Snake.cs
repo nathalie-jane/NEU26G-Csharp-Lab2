@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DungeonCrawler.Entities.Enemies
+namespace DungeonCrawler.Entities.Characters.Enemies
 {
     // Properties and behavior specific to snake type enemy
     internal class Snake : Enemy

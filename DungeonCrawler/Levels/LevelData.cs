@@ -1,36 +1,35 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Entities;
-using DungeonCrawler.Entities.Enemies;
+using DungeonCrawler.Entities.Characters.Enemies;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DungeonCrawler.Levels
 {
-    // Level data for tracking game entities and player start position on the map
+    // Store and manage game entities from level file
     internal class LevelData
     {
-        private List<LevelEntity> entities = new();
-        public IReadOnlyList<LevelEntity> Entities => entities;
+        private readonly List<LevelEntity> entities = new(); // Store references to all game entities created from level file
+        public IReadOnlyList<LevelEntity> Entities => entities; // Make entities list read-only to prevent external modification
+        public Position? PlayerStartPosition { get; private set; } // Store starting position when the correct symbol is found in the level file
 
-        public Position? PlayerStartPosition { get; private set; }
-
-        
+        // Load game entities and starting position for player from level file
         public void LoadLevel(string filename)
         {
             using (StreamReader reader = new(filename))
             {
                 int mapRowIndex = 0;
 
-                string? line = reader.ReadLine();
+                string? currentRow = reader.ReadLine();
 
-                // Read and process each row from level map file
-                while (line is not null)
+                // Read and process each row from level file
+                while (currentRow is not null)
                 {
                     // Read and process each column to identify map symbols and create corresponding game entities
-                    for (int mapColumnIndex = 0; mapColumnIndex < line.Length; mapColumnIndex++)
+                    for (int mapColumnIndex = 0; mapColumnIndex < currentRow.Length; mapColumnIndex++)
                     {
-                        char displaySymbol = line[mapColumnIndex];
+                        char displaySymbol = currentRow[mapColumnIndex];
 
                         Position position = new(mapColumnIndex, mapRowIndex);
 
@@ -43,7 +42,7 @@ namespace DungeonCrawler.Levels
                                 break;
 
                             case '@':
-                                PlayerStartPosition = position; // Set start position for player based on level map file
+                                PlayerStartPosition = position; // Set starting position for player based on level file
 
                                 break;
 
@@ -63,7 +62,7 @@ namespace DungeonCrawler.Levels
 
                     mapRowIndex++;
 
-                    line = reader.ReadLine();
+                    currentRow = reader.ReadLine();
                 }
             }
         }
