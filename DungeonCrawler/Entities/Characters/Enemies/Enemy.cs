@@ -11,7 +11,7 @@ namespace DungeonCrawler.Entities.Characters.Enemies
     {
         public string Species { get; }
 
-        // Initialise properties shared by enemies
+        // Initialize properties shared by enemies
         protected Enemy(Position position, char displaySymbol, ConsoleColor displayColor, string species, int healthPoints, DiceConfiguration attack, DiceConfiguration defense)
             : base(position, displaySymbol, displayColor, healthPoints, attack, defense)
         {

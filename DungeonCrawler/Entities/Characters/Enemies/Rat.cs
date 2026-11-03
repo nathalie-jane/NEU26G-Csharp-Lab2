@@ -9,7 +9,7 @@ namespace DungeonCrawler.Entities.Characters.Enemies
     // Extend Enemy class with predefined values for rat type enemy
     internal class Rat : Enemy
     {
-        // Initialise properties specific to rat type enemy
+        // Initialize properties specific to rat type enemy
         public Rat(Position position)
             : base(position, 'r', ConsoleColor.Yellow, "Rat", 10, attack: new DiceConfiguration(1, 6, 3), defense: new DiceConfiguration(1, 6, 1)) { }
 

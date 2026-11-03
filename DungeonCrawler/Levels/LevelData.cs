@@ -15,9 +15,9 @@ namespace DungeonCrawler.Levels
         public Position? PlayerStartPosition { get; private set; } // Store starting position when the correct symbol is found
 
         // Read and process data from level file
-        public void LoadLevel(string filename)
+        public void LoadLevel(string filePath)
         {
-            using (StreamReader reader = new(filename))
+            using (StreamReader reader = new(filePath))
             {
                 int mapRowIndex = 0;
 

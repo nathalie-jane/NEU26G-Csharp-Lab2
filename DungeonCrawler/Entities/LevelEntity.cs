@@ -12,7 +12,7 @@ namespace DungeonCrawler.Entities
         public char DisplaySymbol { get; }
         public ConsoleColor DisplayColor { get; }
 
-        // Initialise properties shared by game entities
+        // Initialize properties shared by game entities
         protected LevelEntity(Position position, char displaySymbol, ConsoleColor displayColor)
         {
             Position = position;
@@ -21,7 +21,7 @@ namespace DungeonCrawler.Entities
         }
 
         // Render game entities on the console
-        public void Render()
+        public void RenderEntity()
         {
             Console.SetCursorPosition(Position.XPosition, Position.YPosition); // Set position for game entities on the console
 
