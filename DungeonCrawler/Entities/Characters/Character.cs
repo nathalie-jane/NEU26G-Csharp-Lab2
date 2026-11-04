@@ -14,7 +14,7 @@ namespace DungeonCrawler.Entities.Characters
         public DiceConfiguration Defense { get; }
 
         // Initialize properties shared by game characters
-        protected Character(Position position, char displaySymbol, ConsoleColor displayColor, int healthPoints, DiceConfiguration attack, DiceConfiguration defense) 
+        protected Character(Position position, char displaySymbol, ConsoleColor displayColor, int healthPoints, DiceConfiguration attack, DiceConfiguration defense)
             : base(position, displaySymbol, displayColor)
         {
             HealthPoints = healthPoints;

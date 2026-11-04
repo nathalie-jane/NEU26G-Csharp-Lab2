@@ -38,24 +38,20 @@ namespace DungeonCrawler.Levels
                             case '#':
                                 Wall wall = new(position);
                                 entities.Add(wall);
-
                                 break;
 
                             case '@':
                                 PlayerStartPosition = position; // Set starting position for player
-
                                 break;
 
                             case 'r':
                                 Rat rat = new(position);
                                 entities.Add(rat);
-
                                 break;
 
                             case 's':
                                 Snake snake = new(position);
                                 entities.Add(snake);
-
                                 break;
                         }
                     }

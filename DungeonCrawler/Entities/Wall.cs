@@ -9,7 +9,7 @@ namespace DungeonCrawler.Entities
     internal class Wall : LevelEntity
     {
         // Initialize properties shared by walls
-        public Wall(Position position) 
+        public Wall(Position position)
             : base(position, '#', ConsoleColor.Gray) { }
     }
 }

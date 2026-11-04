@@ -20,10 +20,10 @@ namespace DungeonCrawler.Entities
             DisplayColor = displayColor;
         }
 
-        // Render game entities on the console
+        // Handle rendering of an individual game entity in the console window
         public void RenderEntity()
         {
-            Console.SetCursorPosition(Position.XPosition, Position.YPosition); // Set position for game entities on the console
+            Console.SetCursorPosition(Position.XPosition, Position.YPosition);
 
             Console.ForegroundColor = DisplayColor;
             Console.Write(DisplaySymbol);

@@ -2,6 +2,7 @@
 using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
 using DungeonCrawler.Levels;
+using DungeonCrawler.Systems.Movement;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -19,10 +20,34 @@ namespace DungeonCrawler.Core
             levelData = new();
         }
 
+        public void RunGame()
+        {
+            SetUpLevel();
+
+            Console.CursorVisible = false; // Hide cursor in console window
+
+            bool isGameRunning = true;
+
+            while (isGameRunning)
+            {
+                RenderLevel();
+
+                ConsoleKey keyInput = MovementSystem.GetKeyInput();
+
+                if (keyInput is ConsoleKey.Escape)
+                {
+                    isGameRunning = false;
+                }
+            }
+        }
+
         // Load game level and create starting position for player
         public void SetUpLevel()
         {
-            string filePath = Path.Combine(AppContext.BaseDirectory, "Levels", "Maps", "Level1.txt");
+            // Create file path to level file by combining application directory with relative path
+            string baseDirectory = AppContext.BaseDirectory;
+            string relativePath = Path.Combine("Levels", "Maps", "Level1.txt");
+            string filePath = Path.Combine(baseDirectory, relativePath);
 
             levelData.LoadLevel(filePath);
 
@@ -39,7 +64,7 @@ namespace DungeonCrawler.Core
             }
         }
 
-        // Display all game entities on the console
+        // Display game level with all entities in the console window
         public void RenderLevel()
         {
             Console.Clear();
