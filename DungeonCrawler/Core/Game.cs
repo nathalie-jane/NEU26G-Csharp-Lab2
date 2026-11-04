@@ -34,9 +34,16 @@ namespace DungeonCrawler.Core
 
                 ConsoleKey keyInput = MovementSystem.GetKeyInput();
 
-                if (keyInput is ConsoleKey.Escape)
+                if (keyInput is ConsoleKey.Escape) // Exit game if Esc key is pressed
                 {
                     isGameRunning = false;
+                }
+                else
+                {
+                    if (player is not null)
+                    {
+                        MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
+                    }
                 }
             }
         }

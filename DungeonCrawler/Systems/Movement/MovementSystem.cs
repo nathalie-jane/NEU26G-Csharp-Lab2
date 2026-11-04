@@ -1,5 +1,6 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Entities;
+using DungeonCrawler.Entities.Characters;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -39,7 +40,7 @@ namespace DungeonCrawler.Systems.Movement
             }
         }
 
-        // Get target position for player based on movement direction from keyboard input
+        // Get target position for player based on movement direction from key press
         public static Position GetPlayerTargetPosition(Position currentPlayerPosition, ConsoleKey keyInput)
         {
             Position targetPlayerPosition = currentPlayerPosition;
@@ -81,6 +82,32 @@ namespace DungeonCrawler.Systems.Movement
             }
 
             return null;
+        }
+
+        // Update player position if movement direction is valid and no game entity is occupying the target position
+        public static bool TryPlayerMovement(Player player, ConsoleKey keyInput, IReadOnlyList<LevelEntity> entities)
+        {
+            if (!IsKeyInputValidMovement(keyInput)) // Prevent player from moving if key press is not a movement direction
+            {
+                return false;
+            }
+            else
+            {
+                Position targetPlayerPosition = GetPlayerTargetPosition(player.Position, keyInput);
+
+                LevelEntity? levelObstacle = GetPlayerObstacle(targetPlayerPosition, entities);
+
+                if (levelObstacle is not null) // Prevent player from moving into an occupied position
+                {
+                    return false;
+                }
+                else
+                {
+                    player.UpdatePosition(targetPlayerPosition);
+
+                    return true;
+                }
+            }
         }
     }
 }

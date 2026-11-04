@@ -10,7 +10,13 @@ namespace DungeonCrawler.Entities.Characters
     internal class Player : Character
     {
         // Initialize properties shared by player character
-        public Player(Position position) 
+        public Player(Position position)
             : base(position, '@', ConsoleColor.Cyan, 100, attack: new DiceConfiguration(2, 6, 2), defense: new DiceConfiguration(2, 6, 0)) { }
+
+        // Update player position after movement
+        public void UpdatePosition(Position newPosition)
+        {
+            Position = newPosition;
+        }
     }
 }
