@@ -119,5 +119,15 @@ namespace DungeonCrawler.Systems.Movement
                 }
             }
         }
+
+        // Get random movement direction for rat type enemies
+        public static (int XAxis, int YAxis) GetRatDirection()
+        {
+            int directionsIndex = Random.Shared.Next(Directions.Length);
+
+            (int XAxis, int YAxis) ratDirection = Directions[directionsIndex];
+
+            return ratDirection;
+        }
     }
 }
