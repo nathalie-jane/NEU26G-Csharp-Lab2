@@ -10,14 +10,14 @@ namespace DungeonCrawler.Systems.Movement
     // Handle movement related logic for all game characters
     internal class MovementSystem
     {
-        // Define possible coordinate changes for enemy movement
-        private static readonly (int XAxis, int YAxis)[] Directions =
-        [
-            (0, -1), // Up
-            (1, 0), // Right
-            (0, 1), // Down
-            (-1, 0) // Left
-        ];
+        // Define possible movement directions for enemy characters
+        private static readonly Dictionary<string, (int XAxis, int YAxis)> enemyDirections = new()
+        {
+            { "Up", (0, -1) },
+            { "Right", (1, 0) },
+            { "Down", (0, 1) },
+            { "Left", (-1, 0) }
+        };
 
         // Get user key press for player movement
         public static ConsoleKey GetKeyInput()
@@ -123,9 +123,9 @@ namespace DungeonCrawler.Systems.Movement
         // Get random movement direction for rat type enemies
         public static (int XAxis, int YAxis) GetRatDirection()
         {
-            int directionsIndex = Random.Shared.Next(Directions.Length);
+            int directionsIndex = Random.Shared.Next(enemyDirections.Count);
 
-            (int XAxis, int YAxis) ratDirection = Directions[directionsIndex];
+            (int XAxis, int YAxis) ratDirection = enemyDirections.Values.ElementAt(directionsIndex);
 
             return ratDirection;
         }
