@@ -11,7 +11,7 @@ namespace DungeonCrawler.Systems.Movement
     internal class MovementSystem
     {
         // Define possible movement directions for enemy characters
-        private static readonly Dictionary<string, (int XAxis, int YAxis)> enemyDirections = new()
+        private static readonly Dictionary<string, (int XAxis, int YAxis)> enemyMovements = new()
         {
             { "Up", (0, -1) },
             { "Right", (1, 0) },
@@ -121,13 +121,54 @@ namespace DungeonCrawler.Systems.Movement
         }
 
         // Get random movement direction for rat type enemies
-        public static (int XAxis, int YAxis) GetRatDirection()
+        public static (int XAxis, int YAxis) GetRatMovement()
         {
-            int directionsIndex = Random.Shared.Next(enemyDirections.Count);
+            int movementsIndex = Random.Shared.Next(enemyMovements.Count);
 
-            (int XAxis, int YAxis) ratDirection = enemyDirections.Values.ElementAt(directionsIndex);
+            (int XAxis, int YAxis) ratMovement = enemyMovements.Values.ElementAt(movementsIndex);
 
-            return ratDirection;
+            return ratMovement;
+        }
+
+        // Get movement direction for snake type enemies based on player position
+        public static (int XAxis, int YAxis) GetSnakeMovement(Position snakePosition, Position playerPosition)
+        {
+            List<(int XAxis, int YAxis)> validMovements = new();
+            {
+                // Determine horizontal movement direction away from player
+                if (snakePosition.XPosition > playerPosition.XPosition)
+                {
+                    validMovements.Add(enemyMovements["Right"]);
+                }
+                else if (snakePosition.XPosition < playerPosition.XPosition)
+                {
+                    validMovements.Add(enemyMovements["Left"]);
+                }
+
+                // Determine vertical movement direction away from player
+                if (snakePosition.YPosition > playerPosition.YPosition)
+                {
+                    validMovements.Add(enemyMovements["Down"]);
+                }
+                else if (snakePosition.YPosition < playerPosition.YPosition)
+                {
+                    validMovements.Add(enemyMovements["Up"]);
+                }
+
+                // Return no movement if no valid directions are available (e.g. if snake is surrounded by obstacles)
+                if (validMovements.Count == 0)
+                {
+                    return (0, 0);
+                }
+                else // Randomly select a valid movement direction when the player is diagonally positioned from the snake
+                {
+                    int movementsIndex = Random.Shared.Next(validMovements.Count);
+
+                    (int XAxis, int YAxis) snakeMovement = validMovements.ElementAt(movementsIndex);
+
+                    return snakeMovement;
+                } 
+            }
         }
     }
 }
