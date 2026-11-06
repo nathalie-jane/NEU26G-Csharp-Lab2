@@ -7,8 +7,18 @@ using System.Text;
 
 namespace DungeonCrawler.Systems.Movement
 {
+    // Handle movement related logic for all game characters
     internal class MovementSystem
     {
+        // Define possible coordinate changes for enemy movement
+        private static readonly (int XAxis, int YAxis)[] Directions =
+        [
+            (0, -1), // Up
+            (1, 0), // Right
+            (0, 1), // Down
+            (-1, 0) // Left
+        ];
+
         // Get user key press for player movement
         public static ConsoleKey GetKeyInput()
         {

@@ -1,6 +1,7 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
+using DungeonCrawler.Entities.Characters.Enemies;
 using DungeonCrawler.Levels;
 using DungeonCrawler.Systems.Movement;
 using System;
@@ -24,7 +25,7 @@ namespace DungeonCrawler.Core
         {
             SetUpLevel();
 
-            Console.CursorVisible = false; // Hide cursor in console window
+            Console.CursorVisible = false;
 
             bool isGameRunning = true;
 
