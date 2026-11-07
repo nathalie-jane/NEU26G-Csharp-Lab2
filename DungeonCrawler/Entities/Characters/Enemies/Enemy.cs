@@ -18,6 +18,12 @@ namespace DungeonCrawler.Entities.Characters.Enemies
             Species = species;
         }
 
+        // Update enemy position after movement
+        public void UpdatePosition(Position newPosition)
+        {
+            Position = newPosition;
+        }
+
         // Implement specific behavior for each enemy type
         public abstract void PerformAction();
     }

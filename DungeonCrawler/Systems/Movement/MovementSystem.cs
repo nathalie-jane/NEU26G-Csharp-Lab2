@@ -1,6 +1,7 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
+using DungeonCrawler.Entities.Characters.Enemies;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -80,7 +81,7 @@ namespace DungeonCrawler.Systems.Movement
             return targetPlayerPosition;
         }
 
-
+        // Check if a game entity is occupying target position for player or enemy movement
         public static LevelEntity? GetMovementObstacle(Position targetPosition, IReadOnlyList<LevelEntity> entities)
         {
             foreach (LevelEntity entity in entities)
@@ -101,23 +102,27 @@ namespace DungeonCrawler.Systems.Movement
             {
                 return false;
             }
-            else
+           
+            Position targetPlayerPosition = GetPlayerTargetPosition(player.Position, keyInput);
+
+            LevelEntity? levelObstacle = GetMovementObstacle(targetPlayerPosition, entities);
+
+            if (levelObstacle is not null) // Prevent player from moving into an occupied position
             {
-                Position targetPlayerPosition = GetPlayerTargetPosition(player.Position, keyInput);
-
-                LevelEntity? levelObstacle = GetMovementObstacle(targetPlayerPosition, entities);
-
-                if (levelObstacle is not null) // Prevent player from moving into an occupied position
-                {
-                    return false;
-                }
-                else
-                {
-                    player.UpdatePosition(targetPlayerPosition);
-
-                    return true;
-                }
+                return false;
             }
+                
+            player.UpdatePosition(targetPlayerPosition);
+
+            return true;
+        }
+
+        // Check if player is occupying target position for enemy movement
+        public static bool IsPlayerAtTargetPosition(Position targetEnemyPosition, Position playerPosition)
+        {
+            bool isPlayerAtTargetPosition = targetEnemyPosition == playerPosition;
+
+            return isPlayerAtTargetPosition;
         }
 
         // Get random movement direction for rat type enemies
@@ -177,6 +182,37 @@ namespace DungeonCrawler.Systems.Movement
             Position targetEnemyPosition = new((enemyPosition.XPosition + enemyMovement.XAxis), (enemyPosition.YPosition + enemyMovement.YAxis));
 
             return targetEnemyPosition;
+        }
+
+        // Update enemy position if movement direction is valid
+        public static bool TryEnemyMovement(Enemy enemy, (int XAxis, int YAxis) enemyMovement, Position playerPosition, IReadOnlyList<LevelEntity> entities)
+        {
+            if (enemyMovement is (0, 0)) // Prevent movement if no valid direction is available
+            {
+                return false;
+            }
+            
+            Position targetEnemyPosition = GetEnemyTargetPosition(enemy.Position, enemyMovement);
+
+            LevelEntity? levelObstacle = GetMovementObstacle(targetEnemyPosition, entities);
+
+            if (levelObstacle is not null) // Prevent movement if position is occupied by another game entity
+            {
+                return false;
+            }
+               
+            bool isPlayerAtTargetPosition = IsPlayerAtTargetPosition(targetEnemyPosition, playerPosition);
+
+            if (isPlayerAtTargetPosition) // Prevent movement if position is occupied by player character
+            {
+                return false;
+            }
+            else
+            {
+                enemy.UpdatePosition(targetEnemyPosition);
+
+                return true;
+            }      
         }
     }
 }
