@@ -1,21 +1,25 @@
 ﻿using DungeonCrawler.Coordinates;
 using DungeonCrawler.Systems.Combat;
+using DungeonCrawler.Systems.Movement;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DungeonCrawler.Entities.Characters.Enemies
 {
-    // Extend Enemy class with predefined values for rat type enemy
+    // Extend Enemy class with predefined values for rats
     internal class Rat : Enemy
     {
-        // Initialize properties specific to rat type enemy
+        // Initialize properties specific to rats
         public Rat(Position position)
             : base(position, 'r', ConsoleColor.Yellow, "Rat", 10, attack: new DiceConfiguration(1, 6, 3), defense: new DiceConfiguration(1, 6, 1)) { }
 
-        public override void PerformAction()
+        //
+        public override void PerformAction(Position playerPosition, IReadOnlyList<LevelEntity> entities)
         {
-            // TODO: Add behavior for rat type enemy
+            (int XAxis, int YAxis) ratMovement = MovementSystem.GetRatMovement();
+
+            MovementSystem.TryEnemyMovement(this, ratMovement, playerPosition, entities);
         }
     }
 }

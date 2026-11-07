@@ -139,40 +139,39 @@ namespace DungeonCrawler.Systems.Movement
         public static (int XAxis, int YAxis) GetSnakeMovement(Position snakePosition, Position playerPosition)
         {
             List<(int XAxis, int YAxis)> validMovements = new();
+            
+            // Determine horizontal movement direction away from player
+            if (snakePosition.XPosition > playerPosition.XPosition)
             {
-                // Determine horizontal movement direction away from player
-                if (snakePosition.XPosition > playerPosition.XPosition)
-                {
-                    validMovements.Add(enemyMovements["Right"]);
-                }
-                else if (snakePosition.XPosition < playerPosition.XPosition)
-                {
-                    validMovements.Add(enemyMovements["Left"]);
-                }
+                validMovements.Add(enemyMovements["Right"]);
+            }
+            else if (snakePosition.XPosition < playerPosition.XPosition)
+            {
+                validMovements.Add(enemyMovements["Left"]);
+            }
 
-                // Determine vertical movement direction away from player
-                if (snakePosition.YPosition > playerPosition.YPosition)
-                {
-                    validMovements.Add(enemyMovements["Down"]);
-                }
-                else if (snakePosition.YPosition < playerPosition.YPosition)
-                {
-                    validMovements.Add(enemyMovements["Up"]);
-                }
+            // Determine vertical movement direction away from player
+            if (snakePosition.YPosition > playerPosition.YPosition)
+            {
+                validMovements.Add(enemyMovements["Down"]);
+            }
+            else if (snakePosition.YPosition < playerPosition.YPosition)
+            {
+                validMovements.Add(enemyMovements["Up"]);
+            }
 
-                // Prevent snake from moving if no movement leads away from player
-                if (validMovements.Count == 0)
-                {
-                    return (0, 0);
-                }
-                else // Randomly select a valid movement direction when the player is diagonally positioned from the snake
-                {
-                    int movementsIndex = Random.Shared.Next(validMovements.Count);
+            // Prevent snake from moving if no movement leads away from player
+            if (validMovements.Count == 0)
+            {
+                return (0, 0);
+            }
+            else // Randomly select a valid movement direction when the player is diagonally positioned from the snake
+            {
+                int movementsIndex = Random.Shared.Next(validMovements.Count);
 
-                    (int XAxis, int YAxis) snakeMovement = validMovements.ElementAt(movementsIndex);
+                (int XAxis, int YAxis) snakeMovement = validMovements.ElementAt(movementsIndex);
 
-                    return snakeMovement;
-                } 
+                return snakeMovement;
             }
         }
 

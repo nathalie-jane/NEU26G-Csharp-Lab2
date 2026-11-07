@@ -44,6 +44,15 @@ namespace DungeonCrawler.Core
                     if (player is not null)
                     {
                         MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
+
+                        // Update enemy positions after player movement
+                        foreach (LevelEntity entity in levelData.Entities)
+                        {
+                            if (entity is Enemy enemy)
+                            {
+                                enemy.PerformAction(player.Position, levelData.Entities);
+                            }
+                        }
                     }
                 }
             }
