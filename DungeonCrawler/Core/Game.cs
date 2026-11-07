@@ -27,12 +27,12 @@ namespace DungeonCrawler.Core
 
             Console.CursorVisible = false;
 
+            RenderLevel();
+
             bool isGameRunning = true;
 
             while (isGameRunning)
             {
-                RenderLevel();
-
                 ConsoleKey keyInput = MovementSystem.GetKeyInput();
 
                 if (keyInput is ConsoleKey.Escape) // Exit game if Esc key is pressed
@@ -43,6 +43,18 @@ namespace DungeonCrawler.Core
                 {
                     if (player is not null)
                     {
+                        // Store previous positions for characters to avoid re-rendering the entire level
+                        Dictionary<Character, Position> previousPositions = new();
+                        previousPositions.Add(player, player.Position);
+                        
+                        foreach (LevelEntity entity in levelData.Entities)
+                        {
+                            if (entity is Enemy enemy)
+                            {
+                                previousPositions.Add(enemy, enemy.Position);
+                            }
+                        }
+
                         MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
 
                         // Update enemy positions after player movement
@@ -53,6 +65,8 @@ namespace DungeonCrawler.Core
                                 enemy.PerformAction(player.Position, levelData.Entities);
                             }
                         }
+
+                        UpdateRenderedCharacterPositions(previousPositions);
                     }
                 }
             }
@@ -94,6 +108,35 @@ namespace DungeonCrawler.Core
             if (player is not null)
             {
                 player.RenderEntity();
+            }
+        }
+
+        // Update character positions without re-rendering the entire level to prevent flickering in the console window
+        private void UpdateRenderedCharacterPositions(Dictionary<Character, Position> previousPositions)
+        {
+            // Clear old positions before rendering new ones
+            foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
+            {
+                Character character = characterPosition.Key;
+                Position previousPosition = characterPosition.Value;
+
+                if (previousPosition != character.Position)
+                {
+                    Console.SetCursorPosition(previousPosition.XPosition, previousPosition.YPosition);
+                    Console.Write(' ');
+                }
+            }
+
+            // Render characters at their new positions
+            foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
+            {
+                Character character = characterPosition.Key;
+                Position previousPosition = characterPosition.Value;
+
+                if (previousPosition != character.Position)
+                {
+                    character.RenderEntity();
+                }
             }
         }
     }
