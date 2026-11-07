@@ -80,12 +80,12 @@ namespace DungeonCrawler.Systems.Movement
             return targetPlayerPosition;
         }
 
-        // Check if a game entity is occupying the player's target position
-        public static LevelEntity? GetPlayerObstacle(Position targetPlayerPosition, IReadOnlyList<LevelEntity> entities)
+
+        public static LevelEntity? GetMovementObstacle(Position targetPosition, IReadOnlyList<LevelEntity> entities)
         {
             foreach (LevelEntity entity in entities)
             {
-                if (entity.Position == targetPlayerPosition)
+                if (entity.Position == targetPosition)
                 {
                     return entity;
                 }
@@ -105,7 +105,7 @@ namespace DungeonCrawler.Systems.Movement
             {
                 Position targetPlayerPosition = GetPlayerTargetPosition(player.Position, keyInput);
 
-                LevelEntity? levelObstacle = GetPlayerObstacle(targetPlayerPosition, entities);
+                LevelEntity? levelObstacle = GetMovementObstacle(targetPlayerPosition, entities);
 
                 if (levelObstacle is not null) // Prevent player from moving into an occupied position
                 {
@@ -155,7 +155,7 @@ namespace DungeonCrawler.Systems.Movement
                     validMovements.Add(enemyMovements["Up"]);
                 }
 
-                // Return no movement if no valid directions are available (e.g. if snake is surrounded by obstacles)
+                // Prevent snake from moving if no movement leads away from player
                 if (validMovements.Count == 0)
                 {
                     return (0, 0);
@@ -169,6 +169,14 @@ namespace DungeonCrawler.Systems.Movement
                     return snakeMovement;
                 } 
             }
+        }
+
+        // Calculate where an enemy should move based on its current position and chosen movement direction
+        public static Position GetEnemyTargetPosition(Position enemyPosition, (int XAxis, int YAxis) enemyMovement)
+        {
+            Position targetEnemyPosition = new((enemyPosition.XPosition + enemyMovement.XAxis), (enemyPosition.YPosition + enemyMovement.YAxis));
+
+            return targetEnemyPosition;
         }
     }
 }
