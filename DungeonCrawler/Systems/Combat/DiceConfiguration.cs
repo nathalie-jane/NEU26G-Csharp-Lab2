@@ -36,5 +36,12 @@ namespace DungeonCrawler.Systems.Combat
 
             return diceSum;
         }
+
+        public override string ToString()
+        {
+            string diceNotation = $"{Quantity}d{Sides}+{Modifier}";
+
+            return diceNotation;
+        }
     }
 }
