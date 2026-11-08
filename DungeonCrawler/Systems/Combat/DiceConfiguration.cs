@@ -37,6 +37,7 @@ namespace DungeonCrawler.Systems.Combat
             return diceSum;
         }
 
+        // Return dice configuration as a string
         public override string ToString()
         {
             string diceNotation = $"{Quantity}d{Sides}+{Modifier}";

@@ -9,7 +9,7 @@ namespace DungeonCrawler.Entities.Characters
     // Base class for all game characters
     internal abstract class Character : LevelEntity
     {
-        public int HealthPoints { get; protected set; } // Allow health points to be modified only within Character class and its subclasses
+        public int HealthPoints { get; internal set; }
         public DiceConfiguration Attack { get; }
         public DiceConfiguration Defense { get; }
 
