@@ -21,6 +21,7 @@ namespace DungeonCrawler.Core
             levelData = new();
         }
 
+        // Main game loop
         public void RunGame()
         {
             SetUpLevel();
@@ -31,6 +32,7 @@ namespace DungeonCrawler.Core
 
             bool isGameRunning = true;
 
+            // Process key input for player movement and updaate game state
             while (isGameRunning)
             {
                 ConsoleKey keyInput = MovementSystem.GetKeyInput();
@@ -65,6 +67,8 @@ namespace DungeonCrawler.Core
                                 enemy.PerformAction(player.Position, levelData.Entities);
                             }
                         }
+
+                        levelData.RemoveDefeatedEnemies();
 
                         UpdateRenderedCharacterPositions(previousPositions);
                     }
@@ -114,25 +118,32 @@ namespace DungeonCrawler.Core
         // Update character positions without re-rendering the entire level to prevent flickering in the console window
         private void UpdateRenderedCharacterPositions(Dictionary<Character, Position> previousPositions)
         {
-            // Clear old positions before rendering new ones
+            // Clear previous positions for characters that have moved or been defeated
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
             {
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
 
-                if (previousPosition != character.Position)
+                if (previousPosition != character.Position || (character is Enemy &&  character.HealthPoints <= 0))
                 {
                     Console.SetCursorPosition(previousPosition.XPosition, previousPosition.YPosition);
                     Console.Write(' ');
                 }
             }
 
-            // Render characters at their new positions
+            // Render characters that have moved to new positions
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
             {
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
 
+                // Prevent defeated enemies from being re-rendered
+                if (character is Enemy && character.HealthPoints <= 0)
+                {
+                    continue;
+                }
+
+                // Render character only if its position has changed
                 if (previousPosition != character.Position)
                 {
                     character.RenderEntity();

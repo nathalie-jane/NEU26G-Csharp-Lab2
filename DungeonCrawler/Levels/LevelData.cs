@@ -62,5 +62,20 @@ namespace DungeonCrawler.Levels
                 }
             }
         }
+
+        // Remove defeated enemies from entities list
+        public void RemoveDefeatedEnemies()
+        {
+            for (int entityListIndex = entities.Count - 1; entityListIndex >= 0; entityListIndex--)
+            {
+                if (entities[entityListIndex] is Enemy enemy)
+                {
+                    if (enemy.HealthPoints <= 0)
+                    {
+                        entities.RemoveAt(entityListIndex);
+                    }
+                }
+            }
+        }
     }
 }
