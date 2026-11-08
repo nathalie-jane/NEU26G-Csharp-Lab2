@@ -19,5 +19,22 @@ namespace DungeonCrawler.Systems.Combat
             Sides = sides;
             Modifier = modifier;
         }
+
+        // Roll configured number of dice and return combined result with modifier
+        public int RollDice()
+        {
+            int diceSum = 0;
+
+            // Roll specified number of dice and add to sum
+            for (int diceRollCount = 0; diceRollCount < Quantity; diceRollCount++)
+            {
+                int diceRollValue = Random.Shared.Next(1, 7);
+                diceSum += diceRollValue;
+            }
+
+            diceSum += Modifier;
+
+            return diceSum;
+        }
     }
 }
