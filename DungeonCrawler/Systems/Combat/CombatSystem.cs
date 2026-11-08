@@ -11,6 +11,12 @@ namespace DungeonCrawler.Systems.Combat
         // Handle attack and counterattack between player and enemy characters
         public static void InitiateCombat(Character attacker, Character target)
         {
+            // Prevent combat if either character is already defeated
+            if (attacker.HealthPoints <= 0 || target.HealthPoints <= 0)
+            {
+                return;
+            }
+
             // Calculate damage using attacker's attack and target's defense dice rolls
             DiceConfiguration attackDice = attacker.Attack;
             DiceConfiguration defenseDice = target.Defense;
