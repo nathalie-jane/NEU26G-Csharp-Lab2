@@ -2,6 +2,7 @@
 using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
 using DungeonCrawler.Entities.Characters.Enemies;
+using DungeonCrawler.Systems.Combat;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -107,7 +108,16 @@ namespace DungeonCrawler.Systems.Movement
 
             LevelEntity? levelObstacle = GetMovementObstacle(targetPlayerPosition, entities);
 
-            if (levelObstacle is not null) // Prevent player from moving into an occupied position
+            // Start combat if player attempts to move into an enemy's position
+            if (levelObstacle is Enemy enemy)
+            {
+                CombatSystem.InitiateCombat(player, enemy);
+
+                return false;
+            }
+
+            // Prevent player from moving into an occupied position
+            if (levelObstacle is not null)
             {
                 return false;
             }
@@ -184,9 +194,10 @@ namespace DungeonCrawler.Systems.Movement
         }
 
         // Update enemy position if movement direction is valid
-        public static bool TryEnemyMovement(Enemy enemy, (int XAxis, int YAxis) enemyMovement, Position playerPosition, IReadOnlyList<LevelEntity> entities)
+        public static bool TryEnemyMovement(Enemy enemy, (int XAxis, int YAxis) enemyMovement, Player player, IReadOnlyList<LevelEntity> entities)
         {
-            if (enemyMovement is (0, 0)) // Prevent movement if no valid direction is available
+            // Prevent movement if no valid direction is available
+            if (enemyMovement is (0, 0)) 
             {
                 return false;
             }
@@ -195,15 +206,19 @@ namespace DungeonCrawler.Systems.Movement
 
             LevelEntity? levelObstacle = GetMovementObstacle(targetEnemyPosition, entities);
 
-            if (levelObstacle is not null) // Prevent movement if position is occupied by another game entity
+            // Prevent movement if position is occupied by another game entity
+            if (levelObstacle is not null)
             {
                 return false;
             }
                
-            bool isPlayerAtTargetPosition = IsPlayerAtTargetPosition(targetEnemyPosition, playerPosition);
+            bool isPlayerAtTargetPosition = IsPlayerAtTargetPosition(targetEnemyPosition, player.Position);
 
-            if (isPlayerAtTargetPosition) // Prevent movement if position is occupied by player character
+            // Start combat if enemy attempts to move into player's position
+            if (isPlayerAtTargetPosition)
             {
+                CombatSystem.InitiateCombat(enemy, player);
+
                 return false;
             }
             else

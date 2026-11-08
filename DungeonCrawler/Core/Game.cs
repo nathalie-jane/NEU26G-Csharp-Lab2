@@ -59,19 +59,41 @@ namespace DungeonCrawler.Core
 
                         MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
 
+                        // End game if player is defeated
+                        if (player.HealthPoints <= 0)
+                        {
+                            isGameRunning = false;
+
+                            break;
+                        }
+
+                        levelData.RemoveDefeatedEnemies();
+
                         // Update enemy positions after player movement
                         foreach (LevelEntity entity in levelData.Entities)
                         {
                             if (entity is Enemy enemy)
                             {
-                                enemy.PerformAction(player.Position, levelData.Entities);
+                                enemy.PerformAction(player, levelData.Entities);
+
+                                if (player.HealthPoints <= 0)
+                                {
+                                    isGameRunning = false;
+
+                                    break;
+                                }
                             }
                         }
 
-                        levelData.RemoveDefeatedEnemies();
-
                         UpdateRenderedCharacterPositions(previousPositions);
                     }
+                }
+
+                // End game if player is defeated
+                if (player is not null && player.HealthPoints <= 0)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Game Over");
                 }
             }
         }

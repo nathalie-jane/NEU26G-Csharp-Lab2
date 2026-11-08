@@ -28,7 +28,7 @@ namespace DungeonCrawler.Systems.Combat
             // Roll specified number of dice and add to sum
             for (int diceRollCount = 0; diceRollCount < Quantity; diceRollCount++)
             {
-                int diceRollValue = Random.Shared.Next(1, 7);
+                int diceRollValue = Random.Shared.Next(1, Sides + 1);
                 diceSum += diceRollValue;
             }
 

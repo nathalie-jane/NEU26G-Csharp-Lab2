@@ -25,6 +25,6 @@ namespace DungeonCrawler.Entities.Characters.Enemies
         }
 
         // Implement specific behavior for each enemy type
-        public abstract void PerformAction(Position playerPosition, IReadOnlyList<LevelEntity> entities);
+        public abstract void PerformAction(Player player, IReadOnlyList<LevelEntity> entities);
     }
 }

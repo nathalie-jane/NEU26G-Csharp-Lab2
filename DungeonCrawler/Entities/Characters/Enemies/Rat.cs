@@ -15,11 +15,11 @@ namespace DungeonCrawler.Entities.Characters.Enemies
             : base(position, 'r', ConsoleColor.Yellow, "Rat", 10, attack: new DiceConfiguration(1, 6, 3), defense: new DiceConfiguration(1, 6, 1)) { }
 
         //
-        public override void PerformAction(Position playerPosition, IReadOnlyList<LevelEntity> entities)
+        public override void PerformAction(Player player, IReadOnlyList<LevelEntity> entities)
         {
             (int XAxis, int YAxis) ratMovement = MovementSystem.GetRatMovement();
 
-            MovementSystem.TryEnemyMovement(this, ratMovement, playerPosition, entities);
+            MovementSystem.TryEnemyMovement(this, ratMovement, player, entities);
         }
     }
 }
