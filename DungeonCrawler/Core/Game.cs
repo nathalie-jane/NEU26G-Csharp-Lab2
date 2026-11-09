@@ -88,13 +88,13 @@ namespace DungeonCrawler.Core
                         UpdateRenderedCharacterPositions(previousPositions);
                     }
                 }
+            }
 
-                // End game if player is defeated
-                if (player is not null && player.HealthPoints <= 0)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Game Over");
-                }
+            // End game if player is defeated
+            if (player is not null && player.HealthPoints <= 0)
+            {
+                Console.Clear();
+                Console.WriteLine("Game Over");
             }
         }
 
@@ -126,6 +126,8 @@ namespace DungeonCrawler.Core
         {
             Console.Clear();
 
+            CenterMap();
+
             foreach (LevelEntity entity in levelData.Entities)
             {
                 entity.RenderEntity();
@@ -148,7 +150,7 @@ namespace DungeonCrawler.Core
 
                 if (previousPosition != character.Position || (character is Enemy &&  character.HealthPoints <= 0))
                 {
-                    Console.SetCursorPosition(previousPosition.XPosition, previousPosition.YPosition);
+                    Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
                     Console.Write(' ');
                 }
             }
@@ -171,6 +173,22 @@ namespace DungeonCrawler.Core
                     character.RenderEntity();
                 }
             }
+        }
+
+        // Center game level map in console window
+        private void CenterMap()
+        {
+            int mapWidth = 53;
+            int mapHeight = 18;
+
+            int consoleWidth = Console.WindowWidth;
+            int consoleHeight = Console.WindowHeight;
+
+            int centerMapXAxis = (consoleWidth - mapWidth) / 2;
+            int centerMapYAxis = (consoleHeight - mapHeight) / 2;
+
+            LevelEntity.CenterMapXAxis = Math.Max(0, centerMapXAxis);
+            LevelEntity.CenterMapYAxis = Math.Max(0, centerMapYAxis);
         }
     }
 }

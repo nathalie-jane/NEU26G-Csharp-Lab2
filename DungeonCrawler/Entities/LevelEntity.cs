@@ -12,6 +12,10 @@ namespace DungeonCrawler.Entities
         public char DisplaySymbol { get; }
         public ConsoleColor DisplayColor { get; }
 
+        // X and Y values to center game level map
+        public static int CenterMapXAxis { get; set; }
+        public static int CenterMapYAxis { get; set; }
+
         // Initialize properties shared by game entities
         protected LevelEntity(Position position, char displaySymbol, ConsoleColor displayColor)
         {
@@ -23,7 +27,7 @@ namespace DungeonCrawler.Entities
         // Handle rendering of an individual game entity in the console window
         public void RenderEntity()
         {
-            Console.SetCursorPosition(Position.XPosition, Position.YPosition);
+            Console.SetCursorPosition((Position.XPosition + CenterMapXAxis), (Position.YPosition + CenterMapYAxis));
 
             Console.ForegroundColor = DisplayColor;
             Console.Write(DisplaySymbol);

@@ -15,10 +15,12 @@ namespace DungeonCrawler.Entities.Characters.Enemies
         public Snake(Position position) 
             : base(position, 's', ConsoleColor.DarkGreen, "Snake", 25, attack: new DiceConfiguration(3, 4, 2), defense: new DiceConfiguration(1, 8, 5)) { }
 
+        // Handle snake movement behavior
         public override void PerformAction(Player player, IReadOnlyList<LevelEntity> entities)
         {
             bool isPlayerWithinRange = VisionSystem.IsSnakeWithinRange(player.Position, Position);
 
+            // Move snake towards player if within range
             if (isPlayerWithinRange)
             {
                 (int XAxis, int YAxis) snakeMovement = MovementSystem.GetSnakeMovement(Position, player.Position);
