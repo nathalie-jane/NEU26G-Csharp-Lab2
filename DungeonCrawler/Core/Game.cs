@@ -17,7 +17,6 @@ namespace DungeonCrawler.Core
     internal class Game
     {
         private readonly LevelData levelData;
-        private readonly HUD hud;
         private Player? player;
         
         private Player ActivePlayer
@@ -33,11 +32,10 @@ namespace DungeonCrawler.Core
             }
         }
         
-        // Initialize level data and HUD
+        // Initialize level data
         public Game()
         {
             levelData = new();
-            hud = new();
         }
 
         // Game loop
@@ -47,7 +45,11 @@ namespace DungeonCrawler.Core
 
             Console.CursorVisible = false;
 
-            RenderLevel();
+            VisionSystem.UpdateDiscoveredWalls(ActivePlayer.Position, levelData.Entities);
+
+            GameRenderer.RenderLevel(ActivePlayer, levelData.Entities);
+
+            HUD.RenderHUD(ActivePlayer.HealthPoints, ActivePlayer.PlayerMoves);
 
             bool isGameRunning = true;
 
@@ -110,9 +112,9 @@ namespace DungeonCrawler.Core
                     }
 
                     VisionSystem.UpdateDiscoveredWalls(ActivePlayer.Position, levelData.Entities);
-                    RenderVisibleWalls(previousPositions[ActivePlayer]);
+                    GameRenderer.RenderVisibleWalls(ActivePlayer.Position, previousPositions[ActivePlayer], levelData.Entities);
 
-                    UpdateRenderedCharacterPositions(previousPositions);
+                    GameRenderer.UpdateRenderedCharacterPositions(ActivePlayer, previousPositions);
 
                     HUD.RenderHUD(ActivePlayer.HealthPoints, ActivePlayer.PlayerMoves);
 
@@ -122,7 +124,7 @@ namespace DungeonCrawler.Core
             }
 
             // End game if player is defeated
-            if (player is not null && player.HealthPoints <= 0)
+            if (ActivePlayer.HealthPoints <= 0)
             {
                 Console.Clear();
                 Console.WriteLine("Game Over");
@@ -150,146 +152,6 @@ namespace DungeonCrawler.Core
             {
                 player = new Player(playerStartPosition.Value);
             }
-        }
-
-        // Render discovered walls and enemies within player's vision range
-        public void RenderLevel()
-        {
-            Console.Clear();
-
-            CenterMap();
-
-            VisionSystem.UpdateDiscoveredWalls(ActivePlayer.Position, levelData.Entities);
-
-            foreach (LevelEntity entity in levelData.Entities)
-            {
-                // Only render walls the player has discovered
-                if (entity is Wall wall)
-                {
-                    if (VisionSystem.IsWallVisible(wall.Position))
-                    {
-                        wall.RenderEntity();
-                    }
-                }
-                else if (entity is Enemy enemy)
-                {
-                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
-
-                    if (isVisible)
-                    {
-                        enemy.RenderEntity();
-                    }
-                }
-            }
-
-            ActivePlayer.RenderEntity();
-
-            HUD.RenderHUD(ActivePlayer.HealthPoints, ActivePlayer.PlayerMoves);
-        }
-
-        // Update character positions without re-rendering the entire level to prevent flickering in the console window
-        private void UpdateRenderedCharacterPositions(Dictionary<Character, Position> previousPositions)
-        {
-
-            Position previousPlayerPosition = previousPositions[ActivePlayer];
-
-            // Clear previous positions for characters that have moved or been defeated
-            foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
-            {
-                Character character = characterPosition.Key;
-                Position previousPosition = characterPosition.Value;
-                bool hasMoved = previousPosition != character.Position;
-
-                if (character is Player)
-                {
-                    if (hasMoved)
-                    {
-                        Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
-                        Console.Write(' ');
-                    }
-                }
-                else if (character is Enemy enemy)
-                {
-                    bool isDefeated = enemy.HealthPoints <= 0;
-                    bool wasVisible = VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
-                    bool isHidden = !VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
-
-                    if (wasVisible && (hasMoved || isDefeated || isHidden))
-                    {
-                        Console.SetCursorPosition(previousPosition.XPosition + LevelEntity.CenterMapXAxis, previousPosition.YPosition + LevelEntity.CenterMapYAxis);
-
-                        Console.Write(' ');
-                    }
-                }
-            }
-
-            // Render characters that have moved to new positions
-            foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
-            {
-                Character character = characterPosition.Key;
-                Position previousPosition = characterPosition.Value;
-                bool hasMoved = previousPosition != character.Position;
-
-                // Prevent defeated enemies from being re-rendered
-                if (character is Enemy && character.HealthPoints <= 0)
-                {
-                    continue;
-                }
-
-                // Render player if its position has changed
-                if (character is Player)
-                {
-                    if (hasMoved)
-                    {
-                        character.RenderEntity();
-                    }
-                }
-                else if (character is Enemy enemy)
-                {
-                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
-                    bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
-
-                    if (isVisible && (hasMoved || wasHidden))
-                    {
-                        enemy.RenderEntity();
-                    }
-                }
-            }
-        }
-
-        // Render walls that have entered player's vision range
-        private void RenderVisibleWalls(Position previousPlayerPosition)
-        {
-            foreach (LevelEntity entity in levelData.Entities)
-            {
-                // Check if wall has entered player's vision range
-                if (entity is Wall wall)
-                {
-                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, wall.Position);
-                    bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, wall.Position);
-
-                    if (isVisible && wasHidden)
-                    {
-                        wall.RenderEntity();
-                    }
-                }
-            }
-        }
-
-        // Center game level map in console window
-        private void CenterMap()
-        {
-            int mapWidth = 53;
-            int mapHeight = 18;
-
-            int consoleWidth = Console.WindowWidth;
-            int consoleHeight = Console.WindowHeight;
-
-            int centerMapXAxis = (consoleWidth - mapWidth) / 2;
-            int centerMapYAxis = (consoleHeight - mapHeight) / 2;
-
-            LevelEntity.CenterMapXAxis = Math.Max(0, centerMapXAxis);
-            LevelEntity.CenterMapYAxis = Math.Max(0, centerMapYAxis);
         }
     }
 }
