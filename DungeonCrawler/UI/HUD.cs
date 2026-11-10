@@ -41,12 +41,23 @@ namespace DungeonCrawler.UI
             Console.SetCursorPosition(combatLogXPosition, combatLogYPosition + spacingYAxis);
             Console.Write(spacingXAxis);
 
-            // Display combat events on separate lines
-            foreach (string combatEntry in combatLog)
+            // Set maximum number of combat events to display
+            int totalLogEntries = combatLog.Count;
+            const int maxEntries = 2;
+            int logStartIndex = totalLogEntries - maxEntries;
+
+            // Prevent negative starting index if log contains fewer than two entries
+            if (logStartIndex < 0)
+            {
+                logStartIndex = 0;
+            }
+
+            // Display latest events on separate lines
+            for (int combatLogIndex = logStartIndex; combatLogIndex < combatLog.Count; combatLogIndex++)
             {
                 Console.SetCursorPosition(combatLogXPosition, combatLogYPosition);
 
-                Console.Write(combatEntry);
+                Console.Write(combatLog[combatLogIndex]);
 
                 combatLogYPosition += spacingYAxis;
             }
