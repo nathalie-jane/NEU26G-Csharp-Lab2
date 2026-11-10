@@ -18,13 +18,13 @@ namespace DungeonCrawler.Core
     {
         private readonly LevelData levelData;
         private Player? player;
-        private readonly HUD headsUpDisplay;
+        private readonly HUD hud;
         
         // Initialize level data and HUD
         public Game()
         {
             levelData = new();
-            headsUpDisplay = new();
+            hud = new();
         }
 
         // Game loop
@@ -103,10 +103,10 @@ namespace DungeonCrawler.Core
 
                         UpdateRenderedCharacterPositions(previousPositions);
 
-                        headsUpDisplay.RenderHUD(player.HealthPoints, player.PlayerMoves);
+                        HUD.RenderHUD(player.HealthPoints, player.PlayerMoves);
 
                         List<string> combatLog = CombatSystem.HandleCombatLog();
-                        headsUpDisplay.RenderCombatLog(combatLog);
+                        HUD.RenderCombatLog(combatLog);
                     }
                 }
             }
@@ -142,7 +142,7 @@ namespace DungeonCrawler.Core
             }
         }
 
-        // Display game level with all entities in the console window
+        // Render discovered walls and enemies within player's vision range
         public void RenderLevel()
         {
             Console.Clear();
@@ -183,23 +183,47 @@ namespace DungeonCrawler.Core
             {
                 player.RenderEntity();
 
-                headsUpDisplay.RenderHUD(player.HealthPoints, player.PlayerMoves);
+                HUD.RenderHUD(player.HealthPoints, player.PlayerMoves);
             }
         }
 
         // Update character positions without re-rendering the entire level to prevent flickering in the console window
         private void UpdateRenderedCharacterPositions(Dictionary<Character, Position> previousPositions)
         {
+            if (player is null)
+            {
+                return;
+            }
+
+            Position previousPlayerPosition = previousPositions[player];
+
             // Clear previous positions for characters that have moved or been defeated
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
             {
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
+                bool hasMoved = previousPosition != character.Position;
 
-                if (previousPosition != character.Position || (character is Enemy && character.HealthPoints <= 0))
+                if (character is Player)
                 {
-                    Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
-                    Console.Write(' ');
+                    if (hasMoved)
+                    {
+                        Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
+                        Console.Write(' ');
+                    }
+                }
+                else if (character is Enemy enemy)
+                {
+                    bool isDefeated = enemy.HealthPoints <= 0;
+                    bool wasVisible = VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
+                    bool isHidden = !VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+
+                    if (wasVisible && (hasMoved || isDefeated || isHidden))
+                    {
+                        Console.SetCursorPosition(previousPosition.XPosition + LevelEntity.CenterMapXAxis, previousPosition.YPosition + LevelEntity.CenterMapYAxis);
+
+                        Console.Write(' ');
+                    }
                 }
             }
 
@@ -208,6 +232,7 @@ namespace DungeonCrawler.Core
             {
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
+                bool hasMoved = previousPosition != character.Position;
 
                 // Prevent defeated enemies from being re-rendered
                 if (character is Enemy && character.HealthPoints <= 0)
@@ -215,10 +240,23 @@ namespace DungeonCrawler.Core
                     continue;
                 }
 
-                // Render character only if its position has changed
-                if (previousPosition != character.Position)
+                // Render player if its position has changed
+                if (character is Player)
                 {
-                    character.RenderEntity();
+                    if (hasMoved)
+                    {
+                        character.RenderEntity();
+                    }
+                }
+                else if (character is Enemy enemy)
+                {
+                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+                    bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
+
+                    if (isVisible && (hasMoved || wasHidden))
+                    {
+                        enemy.RenderEntity();
+                    }
                 }
             }
         }

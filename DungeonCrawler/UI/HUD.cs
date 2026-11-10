@@ -9,7 +9,7 @@ namespace DungeonCrawler.UI
     internal class HUD
     {
         // Display player stats
-        public void RenderHUD(int healthPoints, int playerMoves)
+        public static void RenderHUD(int healthPoints, int playerMoves)
         {
             // Position HUD relative to game level map
             int hudXPosition = LevelEntity.CenterMapXAxis;
@@ -25,7 +25,7 @@ namespace DungeonCrawler.UI
         }
 
         // Display combat events
-        public void RenderCombatLog(IReadOnlyList<string> combatLog)
+        public static void RenderCombatLog(IReadOnlyList<string> combatLog)
         {
             // Position combat events relative to game level map
             int combatLogXPosition = LevelEntity.CenterMapXAxis;

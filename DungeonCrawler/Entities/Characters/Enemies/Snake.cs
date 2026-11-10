@@ -20,7 +20,7 @@ namespace DungeonCrawler.Entities.Characters.Enemies
         {
             bool isPlayerWithinRange = VisionSystem.IsSnakeWithinRange(player.Position, Position);
 
-            // Move snake towards player if within range
+            // Move snake away from player if within range
             if (isPlayerWithinRange)
             {
                 (int XAxis, int YAxis) snakeMovement = MovementSystem.GetSnakeMovement(Position, player.Position);
