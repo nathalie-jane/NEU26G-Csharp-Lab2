@@ -17,8 +17,21 @@ namespace DungeonCrawler.Core
     internal class Game
     {
         private readonly LevelData levelData;
-        private Player? player;
         private readonly HUD hud;
+        private Player? player;
+        
+        private Player ActivePlayer
+        {
+            get
+            {
+                if (player is null)
+                {
+                    throw new InvalidOperationException("Active player not found.");
+                }
+
+                return player;
+            }
+        }
         
         // Initialize level data and HUD
         public Game()
@@ -49,65 +62,62 @@ namespace DungeonCrawler.Core
                 }
                 else
                 {
-                    if (player is not null)
-                    {
-                        // Store previous positions for characters to avoid re-rendering the entire level
-                        Dictionary<Character, Position> previousPositions = new();
-                        previousPositions.Add(player, player.Position);
+                    // Store previous positions for characters to avoid re-rendering the entire level
+                    Dictionary<Character, Position> previousPositions = new();
+                    previousPositions.Add(ActivePlayer, ActivePlayer.Position);
                         
-                        foreach (LevelEntity entity in levelData.Entities)
+                    foreach (LevelEntity entity in levelData.Entities)
+                    {
+                        if (entity is Enemy enemy)
                         {
-                            if (entity is Enemy enemy)
-                            {
-                                previousPositions.Add(enemy, enemy.Position);
-                            }
+                            previousPositions.Add(enemy, enemy.Position);
                         }
-
-                        // Update movement count for player
-                        if (MovementSystem.IsKeyInputValidMovement(keyInput))
-                        {
-                            player.UpdatePlayerMoves();
-                        }
-
-                        MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
-
-                        // End game if player is defeated
-                        if (player.HealthPoints <= 0)
-                        {
-                            isGameRunning = false;
-
-                            break;
-                        }
-
-                        levelData.RemoveDefeatedEnemies();
-
-                        // Update enemy positions after player movement
-                        foreach (LevelEntity entity in levelData.Entities)
-                        {
-                            if (entity is Enemy enemy)
-                            {
-                                enemy.PerformAction(player, levelData.Entities);
-
-                                // End game if player is defeated
-                                if (player.HealthPoints <= 0)
-                                {
-                                    isGameRunning = false;
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        VisionSystem.UpdateDiscoveredWalls(player.Position, levelData.Entities);
-                        RenderVisibleWalls(previousPositions[player]);
-
-                        UpdateRenderedCharacterPositions(previousPositions);
-
-                        HUD.RenderHUD(player.HealthPoints, player.PlayerMoves);
-
-                        List<string> combatLog = CombatSystem.HandleCombatLog();
-                        HUD.RenderCombatLog(combatLog);
                     }
+
+                    // Update movement count for player
+                    if (MovementSystem.IsKeyInputValidMovement(keyInput))
+                    {
+                        ActivePlayer.UpdatePlayerMoves();
+                    }
+
+                    MovementSystem.TryPlayerMovement(ActivePlayer, keyInput, levelData.Entities);
+
+                    // End game if player is defeated
+                    if (ActivePlayer.HealthPoints <= 0)
+                    {
+                        isGameRunning = false;
+
+                        break;
+                    }
+
+                    levelData.RemoveDefeatedEnemies();
+
+                    // Update enemy positions after player movement
+                    foreach (LevelEntity entity in levelData.Entities)
+                    {
+                        if (entity is Enemy enemy)
+                        {
+                            enemy.PerformAction(ActivePlayer, levelData.Entities);
+
+                            // End game if player is defeated
+                            if (ActivePlayer.HealthPoints <= 0)
+                            {
+                                isGameRunning = false;
+
+                                break;
+                            }
+                        }
+                    }
+
+                    VisionSystem.UpdateDiscoveredWalls(ActivePlayer.Position, levelData.Entities);
+                    RenderVisibleWalls(previousPositions[ActivePlayer]);
+
+                    UpdateRenderedCharacterPositions(previousPositions);
+
+                    HUD.RenderHUD(ActivePlayer.HealthPoints, ActivePlayer.PlayerMoves);
+
+                    List<string> combatLog = CombatSystem.HandleCombatLog();
+                    HUD.RenderCombatLog(combatLog);
                 }
             }
 
@@ -149,11 +159,7 @@ namespace DungeonCrawler.Core
 
             CenterMap();
 
-            // Vision range for player's starting position
-            if (player is not null)
-            {
-                VisionSystem.UpdateDiscoveredWalls(player.Position, levelData.Entities);
-            }
+            VisionSystem.UpdateDiscoveredWalls(ActivePlayer.Position, levelData.Entities);
 
             foreach (LevelEntity entity in levelData.Entities)
             {
@@ -167,35 +173,25 @@ namespace DungeonCrawler.Core
                 }
                 else if (entity is Enemy enemy)
                 {
-                    if (player is not null)
-                    {
-                        bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
 
-                        if (isVisible)
-                        {
-                            enemy.RenderEntity();
-                        }
+                    if (isVisible)
+                    {
+                        enemy.RenderEntity();
                     }
                 }
             }
 
-            if (player is not null)
-            {
-                player.RenderEntity();
+            ActivePlayer.RenderEntity();
 
-                HUD.RenderHUD(player.HealthPoints, player.PlayerMoves);
-            }
+            HUD.RenderHUD(ActivePlayer.HealthPoints, ActivePlayer.PlayerMoves);
         }
 
         // Update character positions without re-rendering the entire level to prevent flickering in the console window
         private void UpdateRenderedCharacterPositions(Dictionary<Character, Position> previousPositions)
         {
-            if (player is null)
-            {
-                return;
-            }
 
-            Position previousPlayerPosition = previousPositions[player];
+            Position previousPlayerPosition = previousPositions[ActivePlayer];
 
             // Clear previous positions for characters that have moved or been defeated
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
@@ -216,7 +212,7 @@ namespace DungeonCrawler.Core
                 {
                     bool isDefeated = enemy.HealthPoints <= 0;
                     bool wasVisible = VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
-                    bool isHidden = !VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+                    bool isHidden = !VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
 
                     if (wasVisible && (hasMoved || isDefeated || isHidden))
                     {
@@ -250,7 +246,7 @@ namespace DungeonCrawler.Core
                 }
                 else if (character is Enemy enemy)
                 {
-                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, enemy.Position);
                     bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, previousPosition);
 
                     if (isVisible && (hasMoved || wasHidden))
@@ -264,17 +260,12 @@ namespace DungeonCrawler.Core
         // Render walls that have entered player's vision range
         private void RenderVisibleWalls(Position previousPlayerPosition)
         {
-            if (player is null)
-            {
-                return;
-            }
-
             foreach (LevelEntity entity in levelData.Entities)
             {
                 // Check if wall has entered player's vision range
                 if (entity is Wall wall)
                 {
-                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, wall.Position);
+                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(ActivePlayer.Position, wall.Position);
                     bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, wall.Position);
 
                     if (isVisible && wasHidden)
