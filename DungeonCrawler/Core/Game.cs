@@ -32,7 +32,7 @@ namespace DungeonCrawler.Core
 
             bool isGameRunning = true;
 
-            // Process key input for player movement and updaate game state
+            // Process key input for player movement and update game state
             while (isGameRunning)
             {
                 ConsoleKey keyInput = MovementSystem.GetKeyInput();
