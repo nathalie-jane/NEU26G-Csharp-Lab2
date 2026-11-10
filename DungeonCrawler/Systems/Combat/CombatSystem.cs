@@ -1,4 +1,5 @@
 ﻿using DungeonCrawler.Entities.Characters;
+using DungeonCrawler.Entities.Characters.Enemies;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +9,9 @@ namespace DungeonCrawler.Systems.Combat
     // Handle combat between game characters
     internal class CombatSystem
     {
+        // Store combat events
+        private static readonly List<string> combatLog = new();
+
         // Handle attack and counterattack between player and enemy characters
         public static void InitiateCombat(Character attacker, Character target)
         {
@@ -40,6 +44,20 @@ namespace DungeonCrawler.Systems.Combat
                 }
             }
 
+            // Add event entries to combat log
+            if (attacker is Player && target is Enemy targetEnemy)
+            {
+                string playerAttackMessage = $"You attacked {targetEnemy.Species}, dealing {damage} damage.";
+
+                combatLog.Add(playerAttackMessage);
+            }
+            else if (attacker is Enemy attackingEnemy && target is Player)
+            {
+                string enemyAttackMessage = $"{attackingEnemy.Species} attacked you, dealing {damage} damage.";
+
+                combatLog.Add(enemyAttackMessage);
+            }
+
             // Initiate counterattack if target has remaining health points
             if (target.HealthPoints > 0)
             {
@@ -65,7 +83,31 @@ namespace DungeonCrawler.Systems.Combat
                         attacker.HealthPoints = 0;
                     }
                 }
+
+                // Add event entries to combat log
+                if (target is Player && attacker is Enemy attackingEnemy)
+                {
+                    string playerCounterAttackMessage = $"You struck back, dealing {counterDamage} damage.";
+
+                    combatLog.Add(playerCounterAttackMessage);
+                }
+                else if (target is Enemy counterAttackingEnemy && attacker is Player)
+                {
+                    string enemyCounterAttackMessage = $"{counterAttackingEnemy.Species} struck back, dealing {counterDamage} damage.";
+
+                    combatLog.Add(enemyCounterAttackMessage);
+                }
             }
+        }
+
+        // Get event entries from combat log
+        public static List<string> HandleCombatLog()
+        {
+            List<string> combatEvents = new(combatLog);
+
+            combatLog.Clear();
+
+            return combatEvents;
         }
     }
 }

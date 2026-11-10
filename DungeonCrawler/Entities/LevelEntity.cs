@@ -11,8 +11,6 @@ namespace DungeonCrawler.Entities
         public Position Position { get; protected set; } // Allow position to be modified only within LevelEntity class and its subclasses
         public char DisplaySymbol { get; }
         public ConsoleColor DisplayColor { get; }
-
-        // X and Y values to center game level map
         public static int CenterMapXAxis { get; set; }
         public static int CenterMapYAxis { get; set; }
 

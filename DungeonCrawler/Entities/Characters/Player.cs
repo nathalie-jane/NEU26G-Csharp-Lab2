@@ -12,11 +12,18 @@ namespace DungeonCrawler.Entities.Characters
         // Initialize properties shared by player character
         public Player(Position position)
             : base(position, '@', ConsoleColor.Cyan, 100, attack: new DiceConfiguration(2, 6, 2), defense: new DiceConfiguration(2, 6, 0)) { }
+        public int PlayerMoves { get; private set; } = 0;
 
         // Update player position after movement
         public void UpdatePosition(Position newPosition)
         {
             Position = newPosition;
+        }
+
+        // Update movement count for player
+        public void UpdatePlayerMoves()
+        {
+            PlayerMoves++;
         }
     }
 }

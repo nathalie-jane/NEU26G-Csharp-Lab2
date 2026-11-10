@@ -3,25 +3,30 @@ using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
 using DungeonCrawler.Entities.Characters.Enemies;
 using DungeonCrawler.Levels;
+using DungeonCrawler.Systems.Combat;
 using DungeonCrawler.Systems.Movement;
+using DungeonCrawler.UI;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace DungeonCrawler.Core
 {
+    // Handle game loop
     internal class Game
     {
         private readonly LevelData levelData;
         private Player? player;
+        private readonly HUD headsUpDisplay;
         
-        // Initialize level data
+        // Initialize level data and HUD
         public Game()
         {
             levelData = new();
+            headsUpDisplay = new();
         }
 
-        // Main game loop
+        // Game loop
         public void RunGame()
         {
             SetUpLevel();
@@ -57,6 +62,12 @@ namespace DungeonCrawler.Core
                             }
                         }
 
+                        // Update movement count for player
+                        if (MovementSystem.IsKeyInputValidMovement(keyInput))
+                        {
+                            player.UpdatePlayerMoves();
+                        }
+
                         MovementSystem.TryPlayerMovement(player, keyInput, levelData.Entities);
 
                         // End game if player is defeated
@@ -76,6 +87,7 @@ namespace DungeonCrawler.Core
                             {
                                 enemy.PerformAction(player, levelData.Entities);
 
+                                // End game if player is defeated
                                 if (player.HealthPoints <= 0)
                                 {
                                     isGameRunning = false;
@@ -86,6 +98,12 @@ namespace DungeonCrawler.Core
                         }
 
                         UpdateRenderedCharacterPositions(previousPositions);
+
+                        headsUpDisplay.RenderHUD(player.HealthPoints, player.PlayerMoves);
+
+                        List<string> combatLog = CombatSystem.HandleCombatLog();
+
+                        headsUpDisplay.RenderCombatLog(combatLog);
                     }
                 }
             }
@@ -136,6 +154,8 @@ namespace DungeonCrawler.Core
             if (player is not null)
             {
                 player.RenderEntity();
+
+                headsUpDisplay.RenderHUD(player.HealthPoints, player.PlayerMoves);
             }
         }
 
