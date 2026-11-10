@@ -1,4 +1,5 @@
 ﻿using DungeonCrawler.Coordinates;
+using DungeonCrawler.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,6 +9,9 @@ namespace DungeonCrawler.Systems.Vision
     // Manage vision ranges based on character positions
     internal class VisionSystem
     {
+        // Store discovered wall positions
+        private static readonly HashSet<Position> visibleWalls = new();
+
         // Calculate straight-line distance between two positions
         public static double GetStraightLineDistance(Position position1, Position position2)
         {
@@ -34,6 +38,31 @@ namespace DungeonCrawler.Systems.Vision
             bool isWithinRange = distanceToSnake <= 2; // Snake detection range is 2 units
 
             return isWithinRange;
+        }
+
+        // Check if wall has been discovered by player
+        public static bool IsWallVisible(Position wallPosition)
+        {
+            bool isWallVisible = visibleWalls.Contains(wallPosition);
+
+            return isWallVisible;
+        }
+
+        // Store wall positions within player's vision range
+        public static void UpdateDiscoveredWalls(Position playerPosition, IReadOnlyList<LevelEntity> entities)
+        {
+            foreach (LevelEntity entity in entities)
+            {
+                if (entity is Wall wall)
+                {
+                    bool isWithinVisionRange = IsEntityWithinVisionRange(playerPosition, wall.Position);
+
+                    if (isWithinVisionRange)
+                    {
+                        visibleWalls.Add(wall.Position);
+                    }
+                }
+            }
         }
     }
 }

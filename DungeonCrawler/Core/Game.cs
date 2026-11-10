@@ -5,6 +5,7 @@ using DungeonCrawler.Entities.Characters.Enemies;
 using DungeonCrawler.Levels;
 using DungeonCrawler.Systems.Combat;
 using DungeonCrawler.Systems.Movement;
+using DungeonCrawler.Systems.Vision;
 using DungeonCrawler.UI;
 using System;
 using System.Collections.Generic;
@@ -97,12 +98,14 @@ namespace DungeonCrawler.Core
                             }
                         }
 
+                        VisionSystem.UpdateDiscoveredWalls(player.Position, levelData.Entities);
+                        RenderVisibleWalls(previousPositions[player]);
+
                         UpdateRenderedCharacterPositions(previousPositions);
 
                         headsUpDisplay.RenderHUD(player.HealthPoints, player.PlayerMoves);
 
                         List<string> combatLog = CombatSystem.HandleCombatLog();
-
                         headsUpDisplay.RenderCombatLog(combatLog);
                     }
                 }
@@ -146,9 +149,34 @@ namespace DungeonCrawler.Core
 
             CenterMap();
 
+            // Vision range for player's starting position
+            if (player is not null)
+            {
+                VisionSystem.UpdateDiscoveredWalls(player.Position, levelData.Entities);
+            }
+
             foreach (LevelEntity entity in levelData.Entities)
             {
-                entity.RenderEntity();
+                // Only render walls the player has discovered
+                if (entity is Wall wall)
+                {
+                    if (VisionSystem.IsWallVisible(wall.Position))
+                    {
+                        wall.RenderEntity();
+                    }
+                }
+                else if (entity is Enemy enemy)
+                {
+                    if (player is not null)
+                    {
+                        bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, enemy.Position);
+
+                        if (isVisible)
+                        {
+                            enemy.RenderEntity();
+                        }
+                    }
+                }
             }
 
             if (player is not null)
@@ -168,7 +196,7 @@ namespace DungeonCrawler.Core
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
 
-                if (previousPosition != character.Position || (character is Enemy &&  character.HealthPoints <= 0))
+                if (previousPosition != character.Position || (character is Enemy && character.HealthPoints <= 0))
                 {
                     Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
                     Console.Write(' ');
@@ -191,6 +219,30 @@ namespace DungeonCrawler.Core
                 if (previousPosition != character.Position)
                 {
                     character.RenderEntity();
+                }
+            }
+        }
+
+        // Render walls that have entered player's vision range
+        private void RenderVisibleWalls(Position previousPlayerPosition)
+        {
+            if (player is null)
+            {
+                return;
+            }
+
+            foreach (LevelEntity entity in levelData.Entities)
+            {
+                // Check if wall has entered player's vision range
+                if (entity is Wall wall)
+                {
+                    bool isVisible = VisionSystem.IsEntityWithinVisionRange(player.Position, wall.Position);
+                    bool wasHidden = !VisionSystem.IsEntityWithinVisionRange(previousPlayerPosition, wall.Position);
+
+                    if (isVisible && wasHidden)
+                    {
+                        wall.RenderEntity();
+                    }
                 }
             }
         }
