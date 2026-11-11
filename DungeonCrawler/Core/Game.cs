@@ -114,7 +114,19 @@ namespace DungeonCrawler.Core
             if (ActivePlayer.HealthPoints <= 0)
             {
                 Console.Clear();
-                Console.WriteLine("Game Over");
+
+                string gameOverText = "GAME OVER";
+                int textLength = gameOverText.Length;
+                int textPositionX = (Console.WindowWidth - textLength) / 2;
+                int textPositionY = Console.WindowHeight / 2;
+
+                Console.SetCursorPosition(textPositionX, textPositionY);
+
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.Write(gameOverText);
+                Console.ResetColor();
+
+                MovementSystem.GetKeyInput();
             }
         }
 

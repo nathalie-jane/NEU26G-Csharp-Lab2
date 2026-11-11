@@ -6,16 +6,32 @@ namespace DungeonCrawler.UI
     {
         public static void RenderHUD(int healthPoints, int playerMoves)
         {
+            string gameplayText = "Use arrow keys to navigate (←, ↑, →, ↓)";
+
+            int marginLeft = 3;
+            int marginTop = 1;
+
+            Console.SetCursorPosition(marginLeft, marginTop);
+            Console.Write(gameplayText);
+
+            string exitText = "Press \"Esc\" to exit";
+            int exitTextLength = exitText.Length;
+            int marginRight = 3;
+
+            Console.SetCursorPosition((Console.WindowWidth - exitTextLength - marginRight), marginTop);
+
+            Console.Write(exitText);
+            
             int hudXPosition = LevelEntity.CenterMapXAxis;
             int hudYPosition = LevelEntity.CenterMapYAxis + 19;
 
             // Set spacing and alignment for player stats
-            string spacingXAxis = new(' ', 12);
-            const int textAlignment = -3;
+            string healthStats = $"HP: {healthPoints}";
+            string movesStats = $"Moves: {playerMoves}";
 
             Console.SetCursorPosition(hudXPosition, hudYPosition);
 
-            Console.Write($"HP: {healthPoints,textAlignment} {spacingXAxis}Moves: {playerMoves}");
+            Console.Write(healthStats.PadRight(24) + movesStats);
         }
 
         public static void RenderCombatLog(IReadOnlyList<string> combatLog)
