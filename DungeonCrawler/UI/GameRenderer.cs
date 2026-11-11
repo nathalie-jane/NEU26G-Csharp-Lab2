@@ -2,17 +2,12 @@
 using DungeonCrawler.Entities;
 using DungeonCrawler.Entities.Characters;
 using DungeonCrawler.Entities.Characters.Enemies;
-using DungeonCrawler.Levels;
 using DungeonCrawler.Systems.Vision;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DungeonCrawler.UI
 {
     internal class GameRenderer
     {
-        // Center game level map in console window
         public static void CenterMap()
         {
             int mapWidth = 53;
@@ -28,12 +23,10 @@ namespace DungeonCrawler.UI
             LevelEntity.CenterMapYAxis = Math.Max(0, centerMapYAxis);
         }
 
-        // Render walls that have entered player's vision range
         public static void RenderVisibleWalls(Position playerPosition, Position previousPlayerPosition, IReadOnlyList<LevelEntity> entities)
         {
             foreach (LevelEntity entity in entities)
             {
-                // Check if wall has entered player's vision range
                 if (entity is Wall wall)
                 {
                     bool isVisible = VisionSystem.IsEntityWithinVisionRange(playerPosition, wall.Position);
@@ -47,13 +40,11 @@ namespace DungeonCrawler.UI
             }
         }
 
-        // Update character positions without re-rendering the entire level to prevent flickering in the console window
         public static void UpdateRenderedCharacterPositions(Player player, Dictionary<Character, Position> previousPositions)
         {
 
             Position previousPlayerPosition = previousPositions[player];
 
-            // Clear previous positions for characters that have moved or been defeated
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
             {
                 Character character = characterPosition.Key;
@@ -65,6 +56,7 @@ namespace DungeonCrawler.UI
                     if (hasMoved)
                     {
                         Console.SetCursorPosition((previousPosition.XPosition + LevelEntity.CenterMapXAxis), (previousPosition.YPosition + LevelEntity.CenterMapYAxis));
+                        
                         Console.Write(' ');
                     }
                 }
@@ -83,20 +75,17 @@ namespace DungeonCrawler.UI
                 }
             }
 
-            // Render characters that have moved to new positions
             foreach (KeyValuePair<Character, Position> characterPosition in previousPositions)
             {
                 Character character = characterPosition.Key;
                 Position previousPosition = characterPosition.Value;
                 bool hasMoved = previousPosition != character.Position;
 
-                // Prevent defeated enemies from being re-rendered
                 if (character is Enemy && character.HealthPoints <= 0)
                 {
                     continue;
                 }
 
-                // Render player if its position has changed
                 if (character is Player)
                 {
                     if (hasMoved)
@@ -117,7 +106,6 @@ namespace DungeonCrawler.UI
             }
         }
 
-        // Render discovered walls and enemies within player's vision range
         public static void RenderLevel(Player player, IReadOnlyList<LevelEntity> entities)
         {
             Console.Clear();
@@ -126,7 +114,6 @@ namespace DungeonCrawler.UI
 
             foreach (LevelEntity entity in entities)
             {
-                // Only render walls the player has discovered
                 if (entity is Wall wall)
                 {
                     if (VisionSystem.IsWallVisible(wall.Position))

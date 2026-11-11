@@ -7,19 +7,15 @@ using DungeonCrawler.Systems.Combat;
 using DungeonCrawler.Systems.Movement;
 using DungeonCrawler.Systems.Vision;
 using DungeonCrawler.UI;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DungeonCrawler.Core
 {
-    // Handle game loop
     internal class Game
     {
-        private readonly LevelData levelData;
-        private Player? player;
+        public readonly LevelData levelData;
+        public Player? player;
         
-        private Player ActivePlayer
+        public Player ActivePlayer
         {
             get
             {
@@ -32,13 +28,11 @@ namespace DungeonCrawler.Core
             }
         }
         
-        // Initialize level data
         public Game()
         {
             levelData = new();
         }
 
-        // Game loop
         public void RunGame()
         {
             SetUpLevel();
@@ -53,18 +47,16 @@ namespace DungeonCrawler.Core
 
             bool isGameRunning = true;
 
-            // Process key input for player movement and update game state
             while (isGameRunning)
             {
                 ConsoleKey keyInput = MovementSystem.GetKeyInput();
 
-                if (keyInput is ConsoleKey.Escape) // Exit game if Esc key is pressed
+                if (keyInput is ConsoleKey.Escape)
                 {
                     isGameRunning = false;
                 }
                 else
                 {
-                    // Store previous positions for characters to avoid re-rendering the entire level
                     Dictionary<Character, Position> previousPositions = new();
                     previousPositions.Add(ActivePlayer, ActivePlayer.Position);
                         
@@ -76,7 +68,6 @@ namespace DungeonCrawler.Core
                         }
                     }
 
-                    // Update movement count for player
                     if (MovementSystem.IsKeyInputValidMovement(keyInput))
                     {
                         ActivePlayer.UpdatePlayerMoves();
@@ -84,7 +75,6 @@ namespace DungeonCrawler.Core
 
                     MovementSystem.TryPlayerMovement(ActivePlayer, keyInput, levelData.Entities);
 
-                    // End game if player is defeated
                     if (ActivePlayer.HealthPoints <= 0)
                     {
                         isGameRunning = false;
@@ -94,14 +84,12 @@ namespace DungeonCrawler.Core
 
                     levelData.RemoveDefeatedEnemies();
 
-                    // Update enemy positions after player movement
                     foreach (LevelEntity entity in levelData.Entities)
                     {
                         if (entity is Enemy enemy)
                         {
                             enemy.PerformAction(ActivePlayer, levelData.Entities);
 
-                            // End game if player is defeated
                             if (ActivePlayer.HealthPoints <= 0)
                             {
                                 isGameRunning = false;
@@ -123,7 +111,6 @@ namespace DungeonCrawler.Core
                 }
             }
 
-            // End game if player is defeated
             if (ActivePlayer.HealthPoints <= 0)
             {
                 Console.Clear();
@@ -131,10 +118,8 @@ namespace DungeonCrawler.Core
             }
         }
 
-        // Load game level and create starting position for player
         public void SetUpLevel()
         {
-            // Create file path to level file by combining application directory with relative path
             string baseDirectory = AppContext.BaseDirectory;
             string relativePath = Path.Combine("Levels", "Maps", "Level1.txt");
             string filePath = Path.Combine(baseDirectory, relativePath);
